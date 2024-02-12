@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyNotes</string>
+    <string name="manage_categories">Wszystkie foldery</string>
+    <string name="add_category">Dodaj folder</string>
+    <string name="sign_out">Wyloguj</string>
+    <string name="name_cannot_be_empty">Pole nie może być puste</string>
+    <string name="cancel">Anuluj</string>
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
+    <string name="delete_category">Usuń folder</string>
+    <string name="rename">Zmień nazwę</string>
+    <string name="sign_in_using_google">Zaloguj się przez Google</string>
+    <string name="just_a_second">Jeszcze chwila...</string>
+    <string name="title">Tytuł</string>
+    <string name="type_something">Napisz coś...</string>
+    <string name="fields_cannot_be_empty">Pola nie mogą być puste</string>
+    <string name="save">Zapisz</string>
+    <string name="back_arrow_icon">Wstecz</string>
+    <string name="new_note">Nowy wpis</string>
+    <string name="delete_entry">Usuń wpis</string>
+    <string name="delete">Usuń</string>
+    <string name="permanently_delete_this_entry">Czy na pewno usunąć?</string>
+    <string name="hello_there">Witaj</string>
+    <string name="please_sign_in">Zaloguj się</string>
+    <string name="your_notes">Twoje notatki</string>
+    <string name="there_are_no_notes_of_this_category_yet">W tym folderze nie ma żadnych notatek</string>
+    <string name="use_the_button_below_to_add_a_note_to_this_category">Użyj przycisku poniżej, aby dodać nowy wpis</string>
+    <string name="your_categories">Twoje foldery</string>
+    <string name="category_name">Nazwa folderu</string>
+    <string name="sign_out_from_your_google_account">Czy na pewno chcesz się wylogować?</string>
+    <string name="leave">Zamknąć edycję?</string>
+    <string name="changes_won_t_be_saved_if_you_don_t_click_the_save_button">Zmiany nie zostaną zapisane, jeżeli nie klikniesz przycisku Zapisz</string>
+    <string name="type_the_new_name">Wpisz nową nazwę</string>
+    <string name="delete_this_category">Usunąć ten folder?</string>
+    <string name="are_you_sure_you_want_to_delete_this_category_and_everything_in_it">Czy jesteś pewien?</string>
+    <string name="you_haven_t_added_any_notes_yet">Nie ma jeszcze żadnych notatek</string>
+    <string name="use_the_button_below_to_add_a_new_entry">Aby dodać nowy wpis, użyj przycisku poniżej</string>
+    <string name="sort_by_date">Sortuj wg daty</string>
+    <string name="new_folder">Nowy folder</string>
+    <string name="no_category">Bez kategorii</string>
+    <string name="font_size">"Rozmiar czcionki: "</string>
+</resources>
