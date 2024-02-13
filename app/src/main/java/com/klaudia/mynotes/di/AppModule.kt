@@ -11,8 +11,17 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.klaudia.mynotes.data.AddEditRepository
+import com.klaudia.mynotes.data.AddEditRepositoryImpl
+import com.klaudia.mynotes.data.CategoryService
 import com.klaudia.mynotes.data.GoogleSignInRepository
 import com.klaudia.mynotes.data.GoogleSignInRepositoryImpl
+import com.klaudia.mynotes.data.HomeRepository
+import com.klaudia.mynotes.data.HomeRepositoryImpl
+import com.klaudia.mynotes.data.ListNotesOfCategoryRepository
+import com.klaudia.mynotes.data.ListNotesOfCategoryRepositoryImpl
+import com.klaudia.mynotes.data.ManageCategoriesRepository
+import com.klaudia.mynotes.data.ManageCategoriesRepositoryImpl
 import com.klaudia.mynotes.data.MongoDbRepository
 import com.klaudia.mynotes.data.MongoDbRepositoryImpl
 import com.klaudia.mynotes.util.Constants.SIGN_IN_REQUEST
@@ -23,14 +32,35 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Named
 
 @Module
 @InstallIn(ViewModelComponent::class)
 object AppModule {
 
+    //@Singleton
     @Provides
-    fun provideMongoDbRepository(): MongoDbRepository = MongoDbRepositoryImpl
+    fun provideMongoDbRepository(impl: MongoDbRepositoryImpl): MongoDbRepository = impl
+
+    @ViewModelScoped
+    @Provides
+    fun provideCategoryService(mongoDbRepository: MongoDbRepository): CategoryService = CategoryService(mongoDbRepository)
+    @ViewModelScoped
+    @Provides
+    fun provideHomeRepository(mongoDbRepository: MongoDbRepository, categoryService: CategoryService): HomeRepository = HomeRepositoryImpl(mongoDbRepository, categoryService)
+
+    @ViewModelScoped
+    @Provides
+    fun provideAddEditRepository(mongoDbRepository: MongoDbRepository): AddEditRepository = AddEditRepositoryImpl(mongoDbRepository)
+
+    @ViewModelScoped
+    @Provides
+    fun provideManageCategoriesRepository(mongoDbRepository: MongoDbRepository, categoryService: CategoryService): ManageCategoriesRepository = ManageCategoriesRepositoryImpl(mongoDbRepository, categoryService)
+
+    @ViewModelScoped
+    @Provides
+    fun provideListNotesOfCategoryRepository(mongoDbRepository: MongoDbRepository, categoryService: CategoryService): ListNotesOfCategoryRepository = ListNotesOfCategoryRepositoryImpl(mongoDbRepository, categoryService)
 
     @Provides
     fun providesFirebaseAuth() = Firebase.auth

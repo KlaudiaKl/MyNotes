@@ -12,12 +12,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klaudia.mynotes.data.Categories
-import com.klaudia.mynotes.data.MongoDbRepository
-import com.klaudia.mynotes.data.MongoDbRepositoryImpl
+import com.klaudia.mynotes.data.ListNotesOfCategoryRepository
+
 import com.klaudia.mynotes.data.Notes
 import com.klaudia.mynotes.model.Category
 import com.klaudia.mynotes.model.RequestState
-import com.klaudia.mynotes.presentation.SharedRepository
 import com.klaudia.mynotes.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,8 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ListNotesOfCatViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val sharedRepository: SharedRepository,
-    private val mongoDbRepository: MongoDbRepository
+    private val listNotesOfCategoryRepository: ListNotesOfCategoryRepository
 ) : ViewModel() {
     var categoryUiState by mutableStateOf(CategoryUiState())
     var categories: MutableState<Categories> = mutableStateOf(RequestState.Idle)
@@ -52,7 +50,7 @@ class ListNotesOfCatViewModel @Inject constructor(
     private fun getSelectedCategory() {
         if (categoryUiState.selectedCategoryId != null) {
             viewModelScope.launch {
-                mongoDbRepository.getSelectedCategory(
+                listNotesOfCategoryRepository.getSelectedCategory(
                     categoryId = org.mongodb.kbson.ObjectId.invoke(
                         categoryUiState.selectedCategoryId!!
                     )
@@ -91,7 +89,7 @@ class ListNotesOfCatViewModel @Inject constructor(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             if (categoryId != null) {
-                sharedRepository.upsertCategory(categoryId, category, onSuccess, onError, name, color)
+                listNotesOfCategoryRepository.upsertCategory(categoryId, category, onSuccess, onError, name, color)
             }
         }
     }
@@ -101,7 +99,7 @@ class ListNotesOfCatViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun getNotesOfCategory(categoryId: ObjectId) {
         viewModelScope.launch {
-            mongoDbRepository.getAllNotesOfCategory(categoryId).collect { result ->
+            listNotesOfCategoryRepository.getAllNotesOfCategory(categoryId).collect { result ->
                 notesOfCategory.value = result
             }
         }

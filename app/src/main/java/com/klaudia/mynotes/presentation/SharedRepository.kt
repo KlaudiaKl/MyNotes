@@ -1,8 +1,8 @@
 package com.klaudia.mynotes.presentation
-
+/*
 import android.util.Log
 import com.klaudia.mynotes.data.MongoDbRepositoryImpl
-import com.klaudia.mynotes.data.MongoDbRepositoryImpl.deleteAllNotesOfCategory
+
 import com.klaudia.mynotes.model.Category
 import com.klaudia.mynotes.model.RequestState
 import kotlinx.coroutines.Dispatchers
@@ -68,4 +68,4 @@ class SharedRepository @Inject constructor() {
             }
     }
 }
-
+*/

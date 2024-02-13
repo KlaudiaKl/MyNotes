@@ -24,4 +24,6 @@ interface MongoDbRepository {
     fun getAllNotesOfCategory(categoryId: ObjectId): Flow<Notes>
     suspend fun deleteAllNotesOfCategory(categoryId: ObjectId): RequestState<Boolean>
     suspend fun updateCategory(category: Category): RequestState<Category>
+
+
 }

@@ -1,5 +1,5 @@
-package com.klaudia.mynotes.presentation
-/*
+package com.klaudia.mynotes.presentation.screens.manage_categories
+
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -12,12 +12,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klaudia.mynotes.data.Categories
-import com.klaudia.mynotes.data.MongoDbRepositoryImpl
+import com.klaudia.mynotes.data.ManageCategoriesRepository
 import com.klaudia.mynotes.model.Category
 import com.klaudia.mynotes.model.RequestState
+import com.klaudia.mynotes.presentation.CategoryUiState
 import com.klaudia.mynotes.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,26 +30,46 @@ import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
-class CategoriesViewModel@Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
-   // private val sharedRepository: SharedRepository): ViewModel() {
+class ManageCategoriesViewModel @Inject constructor(
+    private val categoriesRepository: ManageCategoriesRepository,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
-    private var categoryUiState by mutableStateOf(CategoryUiState())
+    var categoryUiState by mutableStateOf(CategoryUiState())
     val categoryId: String? by derivedStateOf {
         categoryUiState.selectedCategoryId
     }
     var categories: MutableState<Categories> = mutableStateOf(RequestState.Idle)
 
+    private val _categoryName = MutableStateFlow("No Category")
+    val categoryName: StateFlow<String> = _categoryName.asStateFlow()
+
     init {
         getCategoryIdArg()
         getSelectedCategory()
+        getCategories()
     }
 
+    private fun getCategoryIdArg() {
+        categoryUiState = categoryUiState.copy(
+            selectedCategoryId = savedStateHandle.get<String>(
+                key = Constants.MANAGE_CATEGORIES_SCREEN_ARG_KEY
+            )
+        )
+    }
 
+    private fun deleteAllNotesOfCategory(categoryId: ObjectId){
+        viewModelScope.launch(Dispatchers.IO) {
+            categoriesRepository.deleteAllNotesOfCategory(categoryId)
+        }
+    }
+    fun setName(categoryName: String) {
+        categoryUiState = categoryUiState.copy(categoryName = categoryName)
+    }
     private fun getSelectedCategory() {
         if (categoryUiState.selectedCategoryId != null) {
             viewModelScope.launch {
-                MongoDbRepositoryImpl.getSelectedCategory(
+                categoriesRepository.getSelectedCategory(
                     categoryId = org.mongodb.kbson.ObjectId.invoke(
                         categoryUiState.selectedCategoryId!!
                     )
@@ -65,23 +89,41 @@ class CategoriesViewModel@Inject constructor(
         }
     }
 
-
-    private fun getCategoryIdArg() {
-        categoryUiState = categoryUiState.copy(
-            selectedCategoryId = savedStateHandle.get<String>(
-                key = Constants.MANAGE_CATEGORIES_SCREEN_ARG_KEY
-            )
-        )
-    }
-
     fun getSelectedCategoryId(id: String){
         categoryUiState = categoryUiState.copy(
             selectedCategoryId = id
         )
     }
-    fun setName(categoryName: String) {
-        categoryUiState = categoryUiState.copy(categoryName = categoryName)
+
+    fun upsertCategory(
+        categoryId: String?,
+        category: Category,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+        name: String?,
+        color: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+           /* if (categoryId != null&& name != null) {
+                val updatedCategory = category.apply {
+                    this.categoryName = name
+                    this.color = color
+                    _id = ObjectId.invoke(categoryId)
+                }
+                updateCategory(category = updatedCategory, onSuccess = onSuccess, onError = onError, categoryId = categoryId)
+            }
+            else {
+                if (name != null) {
+                    val newCategory = Category().apply {
+                        this.categoryName = name
+                    }
+                    insertCategory(category = newCategory, onSuccess = onSuccess, onError = onError, name, color)
+                }
+            }*/
+            categoriesRepository.upsertCategory(categoryId,category,onSuccess, onError, name, color)
+        }
     }
+
     fun deleteCategory(
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
@@ -90,7 +132,7 @@ class CategoriesViewModel@Inject constructor(
             if (categoryUiState.selectedCategoryId != null) {
                 Log.d("DELETION", "delete cat function called")
                 deleteAllNotesOfCategory(ObjectId(categoryUiState.selectedCategoryId.toString()) )
-                val result = MongoDbRepositoryImpl.deleteCategory(id = ObjectId.invoke(categoryUiState.selectedCategoryId!!))
+                val result = categoriesRepository.deleteCategory(catId  = ObjectId.invoke(categoryUiState.selectedCategoryId!!))
                 if (result is RequestState.Success) {
                     withContext(Dispatchers.Main) {
                         onSuccess()
@@ -107,23 +149,14 @@ class CategoriesViewModel@Inject constructor(
         }
     }
 
-    private fun deleteAllNotesOfCategory(categoryId: ObjectId){
-        viewModelScope.launch(Dispatchers.IO) {
-            MongoDbRepositoryImpl.deleteAllNotesOfCategory(categoryId)
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCategories() {
+        viewModelScope.launch {
+            categoriesRepository.getCategories().collect { result ->
+                categories.value = result
+                Log.d("Categories:", categories.value.toString())
+            }
         }
-    }
 
-    fun upsertCategory(
-        category: Category,
-        name: String?,
-        onSuccess: () -> Unit,
-        onError: (String) -> Unit,
-        color: String
-
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            Log.d("catViewModel id", categoryId.toString())
-                sharedRepository.upsertCategory(categoryId, category, onSuccess, onError, name, color)
-        }
     }
-}*/
+}

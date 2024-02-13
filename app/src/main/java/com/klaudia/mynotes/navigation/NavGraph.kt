@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -31,9 +32,11 @@ import com.klaudia.mynotes.presentation.screens.add_edit.AddEditViewModel
 import com.klaudia.mynotes.presentation.screens.authentication.AuthenticationScreen
 import com.klaudia.mynotes.presentation.screens.authentication.AuthenticationViewModel
 import com.klaudia.mynotes.presentation.screens.home.HomeScreen
+import com.klaudia.mynotes.presentation.screens.home.HomeViewModel
 import com.klaudia.mynotes.presentation.screens.list_notes_of_category.ListNotesOfCatViewModel
 import com.klaudia.mynotes.presentation.screens.list_notes_of_category.ListNotesOfCategoryScreen
 import com.klaudia.mynotes.presentation.screens.manage_categories.ManageCategoriesScreen
+import com.klaudia.mynotes.presentation.screens.manage_categories.ManageCategoriesViewModel
 import com.klaudia.mynotes.util.Constants.ADD_EDIT_CATEGORY_ARG_KEY
 import com.klaudia.mynotes.util.Constants.ADD_EDIT_SCREEN_ARG_KEY
 import com.klaudia.mynotes.util.Constants.APP_ID
@@ -143,8 +146,8 @@ fun NavGraphBuilder.homeScreenRoute(
         var category by remember { mutableStateOf(Category()) }
         val scope = rememberCoroutineScope()
         val context = LocalContext.current
-        // val viewModel: HomeViewModel = viewModel()
-        val viewModel: SharedViewModel = hiltViewModel()
+        val viewModel: HomeViewModel = hiltViewModel()
+        //val viewModel: SharedViewModel = hiltViewModel()
         val notes by viewModel.notes
         val categories by viewModel.categories
 
@@ -308,7 +311,8 @@ fun NavGraphBuilder.manageCategoriesRoute(
     navigateToListNotesOfCategory: (String) -> Unit
 ) {
     composable(route = Screen.ManageCategoriesScreen.route) {
-        val viewModel: SharedViewModel = hiltViewModel()
+       // val viewModel: SharedViewModel = hiltViewModel()
+        val viewModel: ManageCategoriesViewModel = hiltViewModel()
         var deleteCategoryDialogOpened by remember { mutableStateOf(false) }
         var renameCategoryDialogOpened by remember { mutableStateOf(false) }
         var newCategoryDialogOpened by remember { mutableStateOf(false) }

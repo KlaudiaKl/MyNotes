@@ -20,9 +20,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import org.mongodb.kbson.ObjectId
 import java.time.ZoneId
+import javax.inject.Inject
+import javax.inject.Singleton
 
-
-object MongoDbRepositoryImpl : MongoDbRepository {
+@Singleton
+class MongoDbRepositoryImpl @Inject constructor() : MongoDbRepository {
 
     private val app = App.create(APP_ID)
     private val user = app.currentUser
