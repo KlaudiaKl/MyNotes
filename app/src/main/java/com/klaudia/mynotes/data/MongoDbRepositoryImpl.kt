@@ -37,7 +37,7 @@ class MongoDbRepositoryImpl @Inject constructor() : MongoDbRepository {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun getAllNotes(sort: Sort): Flow<Notes> {
         return if (user != null) {
-            Log.d("USER ID", user.id.toString())
+            //Log.d("USER ID", user.id.toString())
             try {
                 realm.query<Note>(query = "ownerId == $0", user.id)
                     .sort(property = "dateCreated", sortOrder = sort)
@@ -76,7 +76,7 @@ class MongoDbRepositoryImpl @Inject constructor() : MongoDbRepository {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun getAllNotesOfCategory(categoryId: ObjectId): Flow<Notes> {
         return if (user != null) {
-            Log.d("USER ID", user.id.toString())
+            //Log.d("USER ID", user.id.toString())
             try {
                 realm.query<Note>(
                     query = "ownerId == $0  AND categoryId == $1",
@@ -211,7 +211,7 @@ class MongoDbRepositoryImpl @Inject constructor() : MongoDbRepository {
 
     override fun getAllCategories(): Flow<Categories> {
         return if (user != null) {
-            Log.d("USER ID", user.id.toString())
+            //Log.d("USER ID", user.id.toString())
             try {
                 realm.query<Category>(query = "ownerId == $0", user.id)
                     .asFlow()

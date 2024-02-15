@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klaudia.mynotes.data.AddEditRepository
-import com.klaudia.mynotes.data.AddEditRepositoryImpl
 import com.klaudia.mynotes.model.Note
 import com.klaudia.mynotes.model.RequestState
 import com.klaudia.mynotes.util.Constants.ADD_EDIT_CATEGORY_ARG_KEY

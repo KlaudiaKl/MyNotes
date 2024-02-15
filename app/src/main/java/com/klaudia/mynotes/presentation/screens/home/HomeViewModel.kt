@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-
 import kotlinx.coroutines.launch
 import org.mongodb.kbson.ObjectId
 import java.time.LocalDate
@@ -82,8 +81,8 @@ class HomeViewModel @Inject constructor(
                     else -> currentState // if not Success state do nothing
                 }
             }
-
             notes.value = updatedNotes // Update the notes state with category names included
+            Log.d("populateNotes called", "true")
         }
     }
 
@@ -93,7 +92,7 @@ class HomeViewModel @Inject constructor(
                 is RequestState.Success -> {
                     val categoryName = state.data?.categoryName ?: ""
                     val categoryColor =
-                        state.data?.color ?: "" // Assuming the new color field is named 'color'
+                        state.data?.color ?: ""
                     Pair(categoryName, categoryColor)
                 }
 
@@ -110,29 +109,18 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    /* @RequiresApi(Build.VERSION_CODES.O)
-     fun getNotes() {
-
-         viewModelScope.launch {
-             MongoDbRepositoryImpl.getAllNotes(Sort.DESCENDING).collect { result ->
-                 when (result) {
-                     is RequestState.Success -> {
-                         notes.value = result
-                         populateNoteCategoryNames() // Populate category names after fetching notes
-                     }
-                     else -> notes.value = result // Handle other states (Error, Loading)
-                 }
-             }
-         }
-     }*/
 
     fun getNotes() {
+        var sort = if (_isSortAscending.value){
+            Sort.ASCENDING
+        }
+        else Sort.DESCENDING
         viewModelScope.launch {
-            homeRepository.getNotes(Sort.DESCENDING).collect { result ->
+            homeRepository.getNotes(sort).collect { result ->
                 when (result) {
                     is RequestState.Success -> {
                         notes.value = result
-                        populateNoteCategoryNames() // Keep UI-related transformations in the ViewModel
+                        populateNoteCategoryNames()
                     }
 
                     else -> notes.value = result // Handle other states (Error, Loading)
@@ -140,22 +128,14 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    /*@RequiresApi(Build.VERSION_CODES.O)
-    fun getCategories() {
-        viewModelScope.launch {
-            MongoDbRepositoryImpl.getAllCategories().collect { result ->
-                categories.value = result
-                Log.d("Categories:", categories.value.toString())
-            }
-        }
-    }*/
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getCategories() {
         viewModelScope.launch {
             homeRepository.getCategories().collect { result ->
                 categories.value = result
-                Log.d("Categories:", categories.value.toString())
+                //Log.d("Categories:", categories.value.toString())
             }
         }
     }
@@ -171,6 +151,4 @@ class HomeViewModel @Inject constructor(
         }
 
     }
-
-
 }

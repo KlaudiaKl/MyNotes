@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -23,7 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.klaudia.mynotes.R
 import com.klaudia.mynotes.model.Category
-import com.klaudia.mynotes.presentation.SharedViewModel
 import com.klaudia.mynotes.presentation.components.AddNewCategoryDialog
 import com.klaudia.mynotes.presentation.components.AlertDialog
 import com.klaudia.mynotes.presentation.components.BottomSheetContent

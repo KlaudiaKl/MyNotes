@@ -199,7 +199,7 @@ class SharedViewModel @Inject constructor(
         onError: (String) -> Unit
     ) {
         val result = repository.updateCategory(category = category.apply {
-            _id = ObjectId.invoke(categoryId!!)
+            _id = ObjectId.invoke(categoryId)
         })
         if (result is RequestState.Success) {
             withContext(Dispatchers.Main) {

@@ -4,9 +4,7 @@ package com.klaudia.mynotes.data
 import com.klaudia.mynotes.model.Category
 import com.klaudia.mynotes.model.RequestState
 import io.realm.kotlin.query.Sort
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
 
