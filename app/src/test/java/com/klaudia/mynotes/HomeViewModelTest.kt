@@ -84,8 +84,8 @@ class HomeViewModelTest {
             }
         )
         val mockNotesDate = LocalDate.now()
-        val mockNotes = flowOf(RequestState.Success(mapOf(mockNotesDate to mockNoteList)))
-        coEvery { homeRepositoryImpl.getNotes(Sort.DESCENDING) } returns mockNotes
+        val mockNotes = RequestState.Success(mapOf(mockNotesDate to mockNoteList))
+        coEvery { homeRepositoryImpl.getNotesWithCategoryDetails(Sort.DESCENDING) } returns flowOf(mockNotes)
         viewModel = HomeViewModel(homeRepositoryImpl)
         Dispatchers.setMain(testDispatcher)
     }
@@ -98,10 +98,15 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `getNotes updates notes state on success`() = runTest {
-        viewModel.getNotes()
-        val result = viewModel.notes.value
+    fun `fetchNotesAndCategories updates notes state on success`() = runTest {
+        viewModel.fetchNotesAndCategories()
+        advanceUntilIdle()
+        val result = viewModel.notesWithCategories.value
         assertTrue("Expectednotes.value to be RequestState.Success", result is RequestState.Success)
+
+        val resultState = viewModel.notesWithCategories.value as RequestState.Success
+        assertEquals("Verify the expected data is present", 1,
+            resultState.data?.size)
     }
 
     @Test
@@ -209,7 +214,7 @@ class HomeViewModelTest {
         val errorMsg = "Network error"
         coEvery { homeRepositoryImpl.getNotes(any())} returns flowOf(RequestState.Error(Exception(errorMsg)))
 
-        viewModel.getNotes()
+        viewModel.fetchNotesAndCategories()
         advanceUntilIdle()
         assertTrue(viewModel.notes.value is RequestState.Error)
         assertEquals(errorMsg, (viewModel.notes.value as RequestState.Error).error.message)

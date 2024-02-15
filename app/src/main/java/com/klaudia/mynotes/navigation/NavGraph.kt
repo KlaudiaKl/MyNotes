@@ -146,7 +146,7 @@ fun NavGraphBuilder.homeScreenRoute(
         val context = LocalContext.current
         val viewModel: HomeViewModel = hiltViewModel()
         //val viewModel: SharedViewModel = hiltViewModel()
-        val notes by viewModel.notes
+        val notes by viewModel.notesWithCategories.collectAsState()
         val categories by viewModel.categories
 
         HomeScreen(

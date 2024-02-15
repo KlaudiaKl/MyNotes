@@ -37,66 +37,48 @@ class HomeViewModel @Inject constructor(
     private val _categoryName = MutableStateFlow("No Category")
     val categoryName: StateFlow<String> = _categoryName.asStateFlow()
 
+    private val _notesWithCategories = MutableStateFlow<RequestState<Map<LocalDate, List<Note>>>>(RequestState.Loading)
+    val notesWithCategories: StateFlow<RequestState<Map<LocalDate, List<Note>>>> = _notesWithCategories.asStateFlow()
+
     private val _isSortAscending = MutableStateFlow(false)
     private val isSortAscending: StateFlow<Boolean> = _isSortAscending.asStateFlow()
 
     init {
         viewModelScope.launch {
             isSortAscending.collect {
-                getNotes()
+                    sortAscending ->
+                fetchNotesAndCategories(if (sortAscending) Sort.ASCENDING else Sort.DESCENDING)
             }
         }
         getCategories()
     }
 
+
     private fun populateNoteCategoryNames() {
         viewModelScope.launch {
+            // Check if notes are in the Success state and if categories are also loaded successfully
+            val notesState = notes.value
+            val categoriesState = categories.value
 
-            val updatedNotes = notes.value.let { currentState ->
-                when (currentState) {
-                    is RequestState.Success -> {
-                        val notesMap = currentState.data ?: return@let currentState
-                        val updatedNotesMap = mutableMapOf<LocalDate, List<Note>>()
+            if (notesState is RequestState.Success && categoriesState is RequestState.Success) {
+                val notesMap = notesState.data ?: emptyMap()
+                val categoriesList = categoriesState.data ?: emptyList()
+                val categoryMap = categoriesList.associateBy { it._id }
 
-                        notesMap.forEach { (date, noteList) ->
-                            val updatedNoteList = noteList.map { note ->
-                                val categoryDetails = note.categoryId?.let { categoryId ->
-                                    getCategoryDetails(categoryId).firstOrNull() ?: Pair("", "")
-                                }
-                                note.apply {
-                                    if (categoryDetails != null) {
-                                        this.categoryName = categoryDetails.first
-                                    }
-                                    if (categoryDetails != null) {
-                                        this.categoryColor = categoryDetails.second
-                                    }
-                                    // Assigning the fetched category name to the note
+                val updatedNotesMap = notesMap.mapValues { entry ->
+                    entry.value.map { note ->
+                        note.apply {
+                            categoryId?.let { id ->
+                                categoryMap[id]?.let { category ->
+                                    categoryName = category.categoryName
+                                    categoryColor = category.color
                                 }
                             }
-                            updatedNotesMap[date] = updatedNoteList
                         }
-                        RequestState.Success(updatedNotesMap)
                     }
-
-                    else -> currentState // if not Success state do nothing
-                }
-            }
-            notes.value = updatedNotes // Update the notes state with category names included
-            Log.d("populateNotes called", "true")
-        }
-    }
-
-    private fun getCategoryDetails(categoryId: ObjectId): Flow<Pair<String, String>> {
-        return homeRepository.getSelectedCategory(categoryId).map { state ->
-            when (state) {
-                is RequestState.Success -> {
-                    val categoryName = state.data?.categoryName ?: ""
-                    val categoryColor =
-                        state.data?.color ?: ""
-                    Pair(categoryName, categoryColor)
                 }
 
-                else -> Pair("", "")
+                notes.value = RequestState.Success(updatedNotesMap)
             }
         }
     }
@@ -108,9 +90,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun fetchNotesAndCategories(sort: Sort) {
+        viewModelScope.launch {
+            //var sort = if (_isSortAscending.value){
+               // Sort.ASCENDING
+           // }
+            //else Sort.DESCENDING
+            homeRepository.getNotesWithCategoryDetails(sort) // or your desired sort
+                .collect { state ->
+                    _notesWithCategories.value = state
+                }
+        }
+    }
 
-
-    fun getNotes() {
+   /* fun getNotes() {
         var sort = if (_isSortAscending.value){
             Sort.ASCENDING
         }
@@ -127,7 +120,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
-    }
+    }*/
 
 
     @RequiresApi(Build.VERSION_CODES.O)
