@@ -139,6 +139,7 @@ class MongoDbRepositoryImpl @Inject constructor() : MongoDbRepository {
                     queriedNote.title = note.title
                     queriedNote.content = note.content
                     queriedNote.fontSize = note.fontSize
+                    queriedNote.categoryId = note.categoryId
 
                     RequestState.Success(data = queriedNote)
                 } else {

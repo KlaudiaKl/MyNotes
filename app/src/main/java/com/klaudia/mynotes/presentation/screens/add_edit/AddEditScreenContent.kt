@@ -1,5 +1,6 @@
 package com.klaudia.mynotes.presentation.screens.add_edit
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -143,8 +144,10 @@ fun AddEditScreenContent(
                         Note().apply {
                             this.title = uiState.title
                             this.content = uiState.content
+                            Log.d("AddEditScreen", "CategoryId: ${uiState.categoryId}")
                             if (uiState.categoryId != null) {
-                            this.categoryId = org.mongodb.kbson.ObjectId(uiState.categoryId)
+                                val hexString = uiState.categoryId.removePrefix("BsonObjectId(").removeSuffix(")")
+                            this.categoryId = org.mongodb.kbson.ObjectId.invoke(hexString)
                             }
                             this.fontSize = fontSize.toDouble()
                         }

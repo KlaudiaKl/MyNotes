@@ -99,7 +99,7 @@ class HomeViewModelTest {
 
     @Test
     fun `fetchNotesAndCategories updates notes state on success`() = runTest {
-        viewModel.fetchNotesAndCategories()
+        viewModel.fetchNotesAndCategories(Sort.DESCENDING)
         advanceUntilIdle()
         val result = viewModel.notesWithCategories.value
         assertTrue("Expectednotes.value to be RequestState.Success", result is RequestState.Success)
@@ -212,12 +212,12 @@ class HomeViewModelTest {
     fun `get Notes updates notes state on error`() = runTest {
 
         val errorMsg = "Network error"
-        coEvery { homeRepositoryImpl.getNotes(any())} returns flowOf(RequestState.Error(Exception(errorMsg)))
+        coEvery { homeRepositoryImpl.getNotesWithCategoryDetails(Sort.DESCENDING)} returns flowOf(RequestState.Error(Exception(errorMsg)))
 
-        viewModel.fetchNotesAndCategories()
+        viewModel.fetchNotesAndCategories(sort = Sort.DESCENDING)
         advanceUntilIdle()
-        assertTrue(viewModel.notes.value is RequestState.Error)
-        assertEquals(errorMsg, (viewModel.notes.value as RequestState.Error).error.message)
+        assertTrue(viewModel.notesWithCategories.value is RequestState.Error)
+        assertEquals(errorMsg, (viewModel.notesWithCategories.value as RequestState.Error).error.message)
 
     }
 

@@ -23,4 +23,8 @@ class AddEditRepositoryImpl @Inject constructor(mongoDbRepository: MongoDbReposi
     override suspend fun deleteNote(noteId : ObjectId): RequestState<Boolean> {
         return mongoDbRepository.deleteNote(noteId)
     }
+
+    override fun getCategories(): Flow<Categories> {
+        return mongoDbRepository.getAllCategories()
+    }
 }

@@ -11,5 +11,6 @@ interface AddEditRepository {
     suspend fun updateNote(note: Note): RequestState<Note>
 
     suspend fun deleteNote(noteId : ObjectId): RequestState<Boolean>
+    fun getCategories(): Flow<Categories>
 
     }

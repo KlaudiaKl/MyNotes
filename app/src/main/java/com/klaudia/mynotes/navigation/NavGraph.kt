@@ -22,9 +22,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.klaudia.mynotes.R
 import com.klaudia.mynotes.model.Category
+import com.klaudia.mynotes.model.Note
 import com.klaudia.mynotes.presentation.components.AddNewCategoryDialog
 import com.klaudia.mynotes.presentation.components.AlertDialog
 import com.klaudia.mynotes.presentation.components.BottomSheetContent
+import com.klaudia.mynotes.presentation.components.CategorySelectionDialog
 import com.klaudia.mynotes.presentation.screens.add_edit.AddEditEntryScreen
 import com.klaudia.mynotes.presentation.screens.add_edit.AddEditViewModel
 import com.klaudia.mynotes.presentation.screens.authentication.AuthenticationScreen
@@ -43,6 +45,7 @@ import io.realm.kotlin.mongodb.App
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.mongodb.kbson.BsonObjectId
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -215,6 +218,7 @@ fun NavGraphBuilder.homeScreenRoute(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.addEditScreenRoute(
     navigateBack: () -> Unit,
     navigateToManageCategoriesScreen: () -> Unit
@@ -239,6 +243,9 @@ fun NavGraphBuilder.addEditScreenRoute(
         val context = LocalContext.current
         var deleteNoteDialogOpened by remember { mutableStateOf(false) }
         var leaveDialogOpened by remember { mutableStateOf(false) }
+        var selectCategory by remember { mutableStateOf(false) }
+        //var currentNote: Note by remember { mutableStateOf(Note) }
+        var categories by viewModel.categories
         AddEditEntryScreen(
             onTitleChanged = { viewModel.setTitle(title = it) },
             onContentChanged = { viewModel.setContent(content = it) },
@@ -261,11 +268,22 @@ fun NavGraphBuilder.addEditScreenRoute(
             onDeleteClicked = {
                 deleteNoteDialogOpened = true
             },
-            onManageCategoriesClicked = navigateToManageCategoriesScreen,
+            onManageCategoriesClicked ={
+                                       selectCategory = true
+                viewModel.getCategories()
+            //navigateToManageCategoriesScreen
+            } ,
+
             onFontSizeChange = { newSize ->
                 viewModel.setFontSize(size = newSize)
             }
         )
+
+        CategorySelectionDialog(noteCatId = uiState.categoryId, categories = categories , onDialogOpen = selectCategory, onConfirm = {
+            viewModel.setCategoryId(it)
+            Log.d("catIdNavGraph", uiState.categoryId?:"no category id")
+        }, onDialogClosed = {selectCategory=false} )
+
         AlertDialog(
             title = stringResource(id = R.string.delete_entry),
             message = stringResource(id = R.string.permanently_delete_this_entry),

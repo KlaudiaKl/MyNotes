@@ -1,5 +1,8 @@
 package com.klaudia.mynotes.presentation.screens.add_edit
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,6 +10,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.klaudia.mynotes.data.AddEditRepository
+import com.klaudia.mynotes.data.Categories
 import com.klaudia.mynotes.model.Note
 import com.klaudia.mynotes.model.RequestState
 import com.klaudia.mynotes.util.Constants.ADD_EDIT_CATEGORY_ARG_KEY
@@ -28,11 +32,22 @@ class AddEditViewModel @Inject constructor(
     ViewModel() {
 
     var uiState by mutableStateOf(UiState())
+    var categories: MutableState<Categories> = mutableStateOf(RequestState.Idle)
 
     init {
         getNoteIdArg()
         getCategoryIdArg()
         getSelectedNote()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCategories() {
+        viewModelScope.launch {
+            addEditRepository.getCategories().collect { result ->
+                categories.value = result
+                //Log.d("Categories:", categories.value.toString())
+            }
+        }
     }
 
     private fun getSelectedNote() {
@@ -51,6 +66,7 @@ class AddEditViewModel @Inject constructor(
                             note.data?.let { setTitle(it.title) }
                             note.data?.let { setContent(it.content) }
                             note.data?.let { setFontSize(it.fontSize) }
+                            note.data?.let {setCategoryId(it.categoryId.toString())}
                         }
                     }
             }
@@ -80,13 +96,19 @@ class AddEditViewModel @Inject constructor(
     fun setContent(content: String) {
         uiState = uiState.copy(content = content)
     }
+    fun setCategoryId(catId: String){
+        uiState = uiState.copy(categoryId = catId)
+    }
 
     private suspend fun insertNote(
         note: Note,
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
     ) {
-        val result = addEditRepository.insertNote(note = note.apply {})
+        val result = addEditRepository.insertNote(note = note.apply {
+            if (!uiState.categoryId.isNullOrEmpty()) {categoryId=ObjectId.invoke(uiState.categoryId!!) }
+        })
+
         if (result is RequestState.Success) {
 
             withContext(Dispatchers.Main) {
@@ -106,6 +128,11 @@ class AddEditViewModel @Inject constructor(
     ) {
         val result = addEditRepository.updateNote(note = note.apply {
             _id = ObjectId.invoke(uiState.selectedNoteId!!)
+            if (!uiState.categoryId.isNullOrEmpty()) {
+                val hexString = uiState.categoryId!!.removePrefix("BsonObjectId(").removeSuffix(")")
+                categoryId=ObjectId.invoke(hexString)
+            }
+
         })
         if (result is RequestState.Success) {
             withContext(Dispatchers.Main) {
