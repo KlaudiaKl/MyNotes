@@ -3,6 +3,8 @@ package com.klaudia.mynotes.navigation
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.DrawerValue
@@ -246,6 +248,15 @@ fun NavGraphBuilder.addEditScreenRoute(
         var selectCategory by remember { mutableStateOf(false) }
         //var currentNote: Note by remember { mutableStateOf(Note) }
         var categories by viewModel.categories
+        val shareIntentLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(), onResult = {})
+        val shareNoteEvent = viewModel.shareNoteEvent.collectAsState(initial = null).value
+
+        LaunchedEffect(shareNoteEvent){
+            shareNoteEvent?.let {
+                shareIntentLauncher.launch(it)
+            }
+        }
+
         AddEditEntryScreen(
             onTitleChanged = { viewModel.setTitle(title = it) },
             onContentChanged = { viewModel.setContent(content = it) },
@@ -276,6 +287,9 @@ fun NavGraphBuilder.addEditScreenRoute(
 
             onFontSizeChange = { newSize ->
                 viewModel.setFontSize(size = newSize)
+            },
+            onShareClicked = {
+                viewModel.prepareShareNoteIntent(uiState.title, uiState.content)
             }
         )
 

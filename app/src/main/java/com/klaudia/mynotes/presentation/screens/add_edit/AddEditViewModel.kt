@@ -1,5 +1,6 @@
 package com.klaudia.mynotes.presentation.screens.add_edit
 
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
@@ -18,7 +19,9 @@ import com.klaudia.mynotes.util.Constants.ADD_EDIT_SCREEN_ARG_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
@@ -33,6 +36,9 @@ class AddEditViewModel @Inject constructor(
 
     var uiState by mutableStateOf(UiState())
     var categories: MutableState<Categories> = mutableStateOf(RequestState.Idle)
+
+    private val _shareNoteEvent = Channel<Intent>(Channel.BUFFERED)
+    val shareNoteEvent = _shareNoteEvent.receiveAsFlow()
 
     init {
         getNoteIdArg()
@@ -181,6 +187,19 @@ class AddEditViewModel @Inject constructor(
 
     fun setFontSize(size: Double) {
         uiState = uiState.copy(fontSize = size)
+    }
+
+    fun prepareShareNoteIntent(noteTitle: String, noteContent: String){
+        val sendIntent: Intent = Intent().apply{
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_SUBJECT, noteTitle)
+            putExtra(Intent.EXTRA_TEXT, noteContent)
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        viewModelScope.launch {
+            _shareNoteEvent.send(shareIntent)
+        }
     }
 }
 

@@ -17,15 +17,17 @@ fun AddEditEntryScreen(
     uiState: UiState,
     onDeleteClicked: () -> Unit,
     onManageCategoriesClicked: () -> Unit,
-    onFontSizeChange: (Double) -> Unit
+    onFontSizeChange: (Double) -> Unit,
+    onShareClicked: () -> Unit
 ) {
     Scaffold(
         topBar = {
             AddEditScreenTopBar(
-                selectedNote = uiState.selectedNote,
+                selectedNoteTitle = uiState.title,
                 onBackPressed = onBackPressed,
                 onDeleteClicked = onDeleteClicked,
-                onManageCategoriesClicked = onManageCategoriesClicked
+                onManageCategoriesClicked = onManageCategoriesClicked,
+                onShareClicked = onShareClicked
             )
         },
 

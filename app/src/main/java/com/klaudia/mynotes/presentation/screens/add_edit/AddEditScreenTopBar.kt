@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,10 +19,11 @@ import com.klaudia.mynotes.model.Note
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditScreenTopBar(
-    selectedNote: Note?,
+    selectedNoteTitle: String?,
     onBackPressed: () -> Unit,
     onDeleteClicked: () -> Unit,
-    onManageCategoriesClicked: () -> Unit
+    onManageCategoriesClicked: () -> Unit,
+    onShareClicked: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         navigationIcon = {
@@ -34,7 +36,7 @@ fun AddEditScreenTopBar(
         },
         title = {
             Text(
-                text = selectedNote?.title?.take(10) ?: stringResource(R.string.new_note),
+                text = selectedNoteTitle?.take(5) ?: stringResource(R.string.new_note),
                 modifier = Modifier.fillMaxWidth(),
                 style = TextStyle(
                     fontSize = MaterialTheme.typography.titleLarge.fontSize,
@@ -55,6 +57,11 @@ fun AddEditScreenTopBar(
                 onManageCategoriesClicked()
             }) {
                 Icon(imageVector = Icons.Default.Folder, contentDescription = stringResource(R.string.add_category))
+            }
+            IconButton(onClick = {
+                onShareClicked()
+            }) {
+                Icon(imageVector = Icons.Default.Share, contentDescription = stringResource(R.string.share))
             }
         }
     )
