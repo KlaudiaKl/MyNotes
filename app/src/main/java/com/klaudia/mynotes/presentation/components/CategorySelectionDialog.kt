@@ -1,6 +1,6 @@
 package com.klaudia.mynotes.presentation.components
 
-import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,11 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import com.klaudia.mynotes.R
 import com.klaudia.mynotes.data.Categories
-import com.klaudia.mynotes.model.Note
 import com.klaudia.mynotes.model.RequestState
-import org.mongodb.kbson.ObjectId
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategorySelectionDialog(
     noteCatId: String?,
@@ -39,7 +36,7 @@ fun CategorySelectionDialog(
             text = {
                 //list all categories
                 //check the category where note.categoryId == category.categoryId
-                LazyColumn() {
+                LazyColumn {
                     if (categories is RequestState.Success && !categories.data.isNullOrEmpty()) {
                         items(categories.data) { category ->
                             Row(verticalAlignment = Alignment.CenterVertically) {

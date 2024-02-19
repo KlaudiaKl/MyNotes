@@ -1,29 +1,21 @@
 package com.klaudia.mynotes
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.klaudia.mynotes.data.HomeRepositoryImpl
 import com.klaudia.mynotes.model.Category
 import com.klaudia.mynotes.model.Note
 import com.klaudia.mynotes.model.RequestState
 import com.klaudia.mynotes.presentation.screens.home.HomeViewModel
 import com.klaudia.mynotes.util.toRealmInstant
-
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-
 import io.mockk.mockk
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.Dispatchers
-
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest

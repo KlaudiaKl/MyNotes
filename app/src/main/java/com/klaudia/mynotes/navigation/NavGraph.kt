@@ -24,7 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.klaudia.mynotes.R
 import com.klaudia.mynotes.model.Category
-import com.klaudia.mynotes.model.Note
+
 import com.klaudia.mynotes.presentation.components.AddNewCategoryDialog
 import com.klaudia.mynotes.presentation.components.AlertDialog
 import com.klaudia.mynotes.presentation.components.BottomSheetContent

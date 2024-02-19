@@ -56,9 +56,8 @@ class AuthenticationViewModel @Inject constructor(
     //MongoDB
 
     private var authenticated = mutableStateOf(false)
-        private set
 
- fun signInWithMongoDB(
+    fun signInWithMongoDB(
         tokenId: String,
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit

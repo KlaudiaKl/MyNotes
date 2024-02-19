@@ -70,7 +70,7 @@ class ManageCategoriesViewModel @Inject constructor(
         if (categoryUiState.selectedCategoryId != null) {
             viewModelScope.launch {
                 categoriesRepository.getSelectedCategory(
-                    categoryId = org.mongodb.kbson.ObjectId.invoke(
+                    categoryId = ObjectId.invoke(
                         categoryUiState.selectedCategoryId!!
                     )
                 )

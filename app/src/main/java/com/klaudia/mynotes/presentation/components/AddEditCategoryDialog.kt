@@ -42,7 +42,7 @@ fun AddNewCategoryDialog(
     title: String,
     text: String
 ) {
-    val colorOptions = listOf("#FF5733", "#FFC300", "#DAF7A6", "#C70039", "#900C3F")
+    val colorOptions = listOf("#FF5733", "#FFC300", "#3EC73C", "#654DFD", "#900C3F")
     var categoryName by remember { mutableStateOf(currentName) }
     var selectedColor by remember { mutableStateOf(currentColor) }
     var isError by remember { mutableStateOf(false) }

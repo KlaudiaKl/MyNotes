@@ -51,7 +51,7 @@ class ListNotesOfCatViewModel @Inject constructor(
         if (categoryUiState.selectedCategoryId != null) {
             viewModelScope.launch {
                 listNotesOfCategoryRepository.getSelectedCategory(
-                    categoryId = org.mongodb.kbson.ObjectId.invoke(
+                    categoryId = ObjectId.invoke(
                         categoryUiState.selectedCategoryId!!
                     )
                 )

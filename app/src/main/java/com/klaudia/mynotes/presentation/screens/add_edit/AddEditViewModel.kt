@@ -3,6 +3,7 @@ package com.klaudia.mynotes.presentation.screens.add_edit
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +57,7 @@ class AddEditViewModel @Inject constructor(
         }
     }
 
-    private fun getSelectedNote() {
+fun getSelectedNote() {
         if (uiState.selectedNoteId != null) {
             viewModelScope.launch {
                 addEditRepository.getSelectedNote(
@@ -106,6 +107,7 @@ class AddEditViewModel @Inject constructor(
         uiState = uiState.copy(categoryId = catId)
     }
 
+    @VisibleForTesting
     private suspend fun insertNote(
         note: Note,
         onSuccess: () -> Unit,

@@ -15,12 +15,10 @@ import com.klaudia.mynotes.model.Note
 import com.klaudia.mynotes.model.RequestState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.query.Sort
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+
 import kotlinx.coroutines.launch
 import org.mongodb.kbson.ObjectId
 import java.time.LocalDate

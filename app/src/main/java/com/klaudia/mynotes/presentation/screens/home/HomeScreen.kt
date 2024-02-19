@@ -2,7 +2,6 @@ package com.klaudia.mynotes.presentation.screens.home
 
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

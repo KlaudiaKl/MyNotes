@@ -5,6 +5,9 @@
       <entry key="app">
         <State />
       </entry>
+      <entry key="dialog_ShouldBeDisplayed_When_onDialogOpen_IsTrue()">
+        <State />
+      </entry>
     </value>
   </component>
 </project>
