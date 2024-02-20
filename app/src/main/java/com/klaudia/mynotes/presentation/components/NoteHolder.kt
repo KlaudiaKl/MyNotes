@@ -87,7 +87,7 @@ fun NoteHolder(
                 //category, if exists
                 if (note.categoryId != null && categoryName != "") {
                     Log.d("color", color)
-                    var bgColor = if(!color.isNullOrEmpty()){
+                    var bgColor = if(color.isNotEmpty()){
                         color.toColor()
                     }
                     else MaterialTheme.colorScheme.background

@@ -24,6 +24,12 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        buildConfigField "String", "WEB_CLIENT", "\"${properties.getProperty("WEB_CLIENT")}\""
+        buildConfigField "String", "APP_ID", "\"${properties.getProperty("APP_ID")}\""
+
     }
 
     buildTypes {

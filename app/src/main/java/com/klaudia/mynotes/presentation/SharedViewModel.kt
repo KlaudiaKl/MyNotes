@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
 import java.time.LocalDate
 import javax.inject.Inject
-
+//this file is to be deleted later, not used anymore
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class SharedViewModel @Inject constructor(

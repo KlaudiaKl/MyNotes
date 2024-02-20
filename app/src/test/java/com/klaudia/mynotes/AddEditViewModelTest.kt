@@ -41,7 +41,7 @@ class AddEditViewModelTest {
         //coEvery { savedStateHandle.get<String>(any()) } returns "testNoteId"
         savedStateHandle = mockk(relaxed = true)
 
-        every { savedStateHandle.get<String>(Constants.ADD_EDIT_SCREEN_ARG_KEY.toString()) } returns "123456789876543212345678"
+        every { savedStateHandle.get<String>(Constants.ADD_EDIT_SCREEN_ARG_KEY) } returns "123456789876543212345678"
         every { savedStateHandle.get<String>(Constants.ADD_EDIT_CATEGORY_ARG_KEY) } returns "123456789876543212345678"
         viewModel = AddEditViewModel(savedStateHandle, addEditRepository)
     }

@@ -1,17 +1,13 @@
 package com.klaudia.mynotes.presentation.screens.add_edit
 
-
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-
 import com.klaudia.mynotes.model.Note
-
-
 @Composable
 fun AddEditEntryScreen(
     onTitleChanged: (String) -> Unit,
     onContentChanged: (String) -> Unit,
-    onDeleteConfirmed: () -> Unit,
+    //onDeleteConfirmed: () -> Unit,
     onBackPressed: () -> Unit,
     onSaveClicked: (Note) -> Unit,
     uiState: UiState,

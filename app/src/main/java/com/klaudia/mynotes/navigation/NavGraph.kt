@@ -47,7 +47,6 @@ import io.realm.kotlin.mongodb.App
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.mongodb.kbson.BsonObjectId
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -87,9 +86,9 @@ fun SetupNavGraph(
             navigateBack = {
                 navController.popBackStack()
             },
-            navigateToManageCategoriesScreen = {
-                navController.navigate(Screen.ManageCategoriesScreen.route)
-            }
+           // navigateToManageCategoriesScreen = {
+             //   navController.navigate(Screen.ManageCategoriesScreen.route)
+          //  }
         )
 
         manageCategoriesRoute(
@@ -223,7 +222,7 @@ fun NavGraphBuilder.homeScreenRoute(
 @RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.addEditScreenRoute(
     navigateBack: () -> Unit,
-    navigateToManageCategoriesScreen: () -> Unit
+    //navigateToManageCategoriesScreen: () -> Unit
 ) {
     composable(
         route = Screen.AddEditEntryScreen.route,
@@ -247,11 +246,13 @@ fun NavGraphBuilder.addEditScreenRoute(
         var leaveDialogOpened by remember { mutableStateOf(false) }
         var selectCategory by remember { mutableStateOf(false) }
         //var currentNote: Note by remember { mutableStateOf(Note) }
-        var categories by viewModel.categories
-        val shareIntentLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(), onResult = {})
+        val categories by viewModel.categories
+        val shareIntentLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+            onResult = {})
         val shareNoteEvent = viewModel.shareNoteEvent.collectAsState(initial = null).value
 
-        LaunchedEffect(shareNoteEvent){
+        LaunchedEffect(shareNoteEvent) {
             shareNoteEvent?.let {
                 shareIntentLauncher.launch(it)
             }
@@ -260,7 +261,6 @@ fun NavGraphBuilder.addEditScreenRoute(
         AddEditEntryScreen(
             onTitleChanged = { viewModel.setTitle(title = it) },
             onContentChanged = { viewModel.setContent(content = it) },
-            onDeleteConfirmed = { },
             onBackPressed = { leaveDialogOpened = true },
             onSaveClicked = {
                 viewModel.upsertNote(
@@ -279,24 +279,28 @@ fun NavGraphBuilder.addEditScreenRoute(
             onDeleteClicked = {
                 deleteNoteDialogOpened = true
             },
-            onManageCategoriesClicked ={
-                                       selectCategory = true
+            onManageCategoriesClicked = {
+                selectCategory = true
                 viewModel.getCategories()
-            //navigateToManageCategoriesScreen
-            } ,
-
+                //navigateToManageCategoriesScreen
+            },
             onFontSizeChange = { newSize ->
                 viewModel.setFontSize(size = newSize)
-            },
-            onShareClicked = {
-                viewModel.prepareShareNoteIntent(uiState.title, uiState.content)
             }
-        )
 
-        CategorySelectionDialog(noteCatId = uiState.categoryId, categories = categories , onDialogOpen = selectCategory, onConfirm = {
-            viewModel.setCategoryId(it)
-            Log.d("catIdNavGraph", uiState.categoryId?:"no category id")
-        }, onDialogClosed = {selectCategory=false} )
+        ) {
+            viewModel.prepareShareNoteIntent(uiState.title, uiState.content)
+        }
+
+        CategorySelectionDialog(
+            noteCatId = uiState.categoryId,
+            categories = categories,
+            onDialogOpen = selectCategory,
+            onConfirm = {
+                viewModel.setCategoryId(it)
+                Log.d("catIdNavGraph", uiState.categoryId ?: "no category id")
+            },
+            onDialogClosed = { selectCategory = false })
 
         AlertDialog(
             title = stringResource(id = R.string.delete_entry),
@@ -341,7 +345,7 @@ fun NavGraphBuilder.manageCategoriesRoute(
     navigateToListNotesOfCategory: (String) -> Unit
 ) {
     composable(route = Screen.ManageCategoriesScreen.route) {
-       // val viewModel: SharedViewModel = hiltViewModel()
+        // val viewModel: SharedViewModel = hiltViewModel()
         val viewModel: ManageCategoriesViewModel = hiltViewModel()
         var deleteCategoryDialogOpened by remember { mutableStateOf(false) }
         var renameCategoryDialogOpened by remember { mutableStateOf(false) }
@@ -513,6 +517,7 @@ fun NavGraphBuilder.listNotesOfCategoryRoute(
         val viewModel: ListNotesOfCatViewModel = hiltViewModel()
         val uiState = viewModel.categoryUiState
         val notes by viewModel.notesOfCategory
+        val context = LocalContext.current
         ListNotesOfCategoryScreen(
             navigateToAddEditScreenWithCategoryArg = navigateToAddEditScreenWithCategoryArg,
             noteEntries = notes,
@@ -523,7 +528,17 @@ fun NavGraphBuilder.listNotesOfCategoryRoute(
                 viewModel.setName(it)
             },
             onSaveNameButtonClick = {
-                viewModel.upsertCategory(it, onSuccess = {}, onError = {}, null, it.color)
+                viewModel.upsertCategory(
+                    it,
+                    onSuccess = { Log.i("ListScreenRename", "name changed successfully") },
+                    onError = { error ->
+                        Toast.makeText(context, "Renaming was unsuccessful", Toast.LENGTH_SHORT)
+                            .show()
+                        Log.i("ListScreenRename", error)
+                    },
+                    name = uiState.categoryName,
+                    color = it.color
+                )
             }
         )
     }

@@ -1,7 +1,6 @@
 package com.klaudia.mynotes.presentation.screens.home
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -18,9 +17,7 @@ import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
 import kotlinx.coroutines.launch
-import org.mongodb.kbson.ObjectId
 import java.time.LocalDate
 import javax.inject.Inject
 
