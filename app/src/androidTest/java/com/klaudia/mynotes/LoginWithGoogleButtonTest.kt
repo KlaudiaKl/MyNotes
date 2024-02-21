@@ -1,9 +1,7 @@
 package com.klaudia.mynotes
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
+
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
