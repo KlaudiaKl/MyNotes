@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -73,7 +74,8 @@ fun LoginWithGoogleButton(
                 Spacer(modifier = Modifier.width(16.dp))
                 CircularProgressIndicator(
                     modifier = Modifier
-                        .size(16.dp),
+                        .size(16.dp)
+                        .testTag("CircularProgressIndicator"),
                     strokeWidth = 2.dp,
                     color = loadingIndicatorColor
                 )

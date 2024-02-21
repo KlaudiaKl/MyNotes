@@ -5,7 +5,19 @@
       <entry key="app">
         <State />
       </entry>
-      <entry key="dialog_ShouldBeDisplayed_When_onDialogOpen_IsTrue()">
+      <entry key="button_hidesLoadingIndicator_whenNotLoading()">
+        <State />
+      </entry>
+      <entry key="button_isDisabled_whenLoading()">
+        <State />
+      </entry>
+      <entry key="button_showsLoadingIndicator_whenLoading()">
+        <State />
+      </entry>
+      <entry key="loginButton_displaysIconCorrectly()">
+        <State />
+      </entry>
+      <entry key="loginButton_displaysLoadingText_whenLoading()">
         <State />
       </entry>
     </value>
