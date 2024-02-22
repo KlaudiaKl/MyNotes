@@ -11,13 +11,13 @@
       <entry key="button_isDisabled_whenLoading()">
         <State />
       </entry>
-      <entry key="button_showsLoadingIndicator_whenLoading()">
+      <entry key="formatDate_displaysCorrectly()">
         <State />
       </entry>
       <entry key="loginButton_displaysIconCorrectly()">
         <State />
       </entry>
-      <entry key="loginButton_displaysLoadingText_whenLoading()">
+      <entry key="noteHolder_DisplaysNote()">
         <State />
       </entry>
     </value>
