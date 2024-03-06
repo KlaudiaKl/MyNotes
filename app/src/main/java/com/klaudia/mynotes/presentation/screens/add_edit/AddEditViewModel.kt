@@ -1,6 +1,7 @@
 package com.klaudia.mynotes.presentation.screens.add_edit
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
@@ -11,12 +12,23 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.klaudia.mynotes.data.AddEditRepository
 import com.klaudia.mynotes.data.Categories
+import com.klaudia.mynotes.data.db.entity.ImageToDelete
+import com.klaudia.mynotes.data.db.entity.ImageToDeleteDao
+import com.klaudia.mynotes.data.db.entity.ImageToUpload
+import com.klaudia.mynotes.data.db.entity.ImageToUploadDao
+import com.klaudia.mynotes.model.Image
+import com.klaudia.mynotes.model.ImagesState
 import com.klaudia.mynotes.model.Note
 import com.klaudia.mynotes.model.RequestState
 import com.klaudia.mynotes.util.Constants.ADD_EDIT_CATEGORY_ARG_KEY
 import com.klaudia.mynotes.util.Constants.ADD_EDIT_SCREEN_ARG_KEY
+import com.klaudia.mynotes.util.fetchImagesFromFirebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +43,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val addEditRepository: AddEditRepository
+    private val addEditRepository: AddEditRepository,
+   private val imageToUploadDao: ImageToUploadDao,
+    private val imageToDeleteDao: ImageToDeleteDao
     ) :
     ViewModel() {
 
@@ -40,6 +54,9 @@ class AddEditViewModel @Inject constructor(
 
     private val _shareNoteEvent = Channel<Intent>(Channel.BUFFERED)
     val shareNoteEvent = _shareNoteEvent.receiveAsFlow()
+
+    val imagesState = ImagesState()
+
 
     init {
         getNoteIdArg()
@@ -74,6 +91,22 @@ fun getSelectedNote() {
                             note.data?.let { setContent(it.content) }
                             note.data?.let { setFontSize(it.fontSize) }
                             note.data?.let {setCategoryId(it.categoryId.toString())}
+                            note.data?.let {
+                                fetchImagesFromFirebase(
+                                    remoteImagePaths = it.images,
+                                    onImageDownload = { downloadedImg ->
+                                        imagesState.addImage(
+                                        Image(
+                                            image = downloadedImg,
+                                            remoteImgPath = extractImagePath(
+                                                fullImageUrl = downloadedImg.toString()
+                                            )
+                                        )
+                                        )
+                                    },
+                                    onReadyToDisplay = { }
+                                )
+                            }
                         }
                     }
             }
@@ -118,7 +151,7 @@ fun getSelectedNote() {
         })
 
         if (result is RequestState.Success) {
-
+            uploadImagesToFirebase()
             withContext(Dispatchers.Main) {
                 onSuccess()
             }
@@ -143,6 +176,7 @@ fun getSelectedNote() {
 
         })
         if (result is RequestState.Success) {
+            uploadImagesToFirebase()
             withContext(Dispatchers.Main) {
                 onSuccess()
             }
@@ -175,6 +209,7 @@ fun getSelectedNote() {
                 val result = addEditRepository.deleteNote(noteId = ObjectId.invoke(uiState.selectedNoteId!!))
                 if (result is RequestState.Success) {
                     withContext(Dispatchers.Main) {
+                        uiState.selectedNote?.let { deleteImagesFromFirebase(it.images) }
 
                         onSuccess()
                     }
@@ -203,6 +238,73 @@ fun getSelectedNote() {
             _shareNoteEvent.send(shareIntent)
         }
     }
+
+
+    fun addImage(image: Uri, imageType: String) {
+        val remoteImagePath = "images/${FirebaseAuth.getInstance().currentUser?.uid}/" +
+                "${image.lastPathSegment}-${System.currentTimeMillis()}.$imageType"
+        imagesState.addImage(
+            Image(
+                image = image,
+                remoteImgPath = remoteImagePath
+            )
+        )
+    }
+
+    private fun uploadImagesToFirebase() {
+        val storage = FirebaseStorage.getInstance().reference
+        imagesState.images.forEach { galleryImage ->
+            val imagePath = storage.child(galleryImage.remoteImgPath)
+            imagePath.putFile(galleryImage.image)
+                .addOnProgressListener {
+                    val sessionUri = it.uploadSessionUri
+                    if (sessionUri != null) {
+                        viewModelScope.launch(Dispatchers.IO) {
+                            imageToUploadDao.addImageToUpload(
+                                ImageToUpload(
+                                    remoteImagePath = galleryImage.remoteImgPath,
+                                    imageUri = galleryImage.image.toString(),
+                                    sessionUri = sessionUri.toString()
+                                )
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun deleteImagesFromFirebase(images: List<String>? = null) {
+        val storage = FirebaseStorage.getInstance().reference
+        if (images != null) {
+            images.forEach { remotePath ->
+                storage.child(remotePath).delete()
+                    .addOnFailureListener {
+                        viewModelScope.launch(Dispatchers.IO) {
+                            imageToDeleteDao.addImageToDelete(
+                                ImageToDelete(remoteImagePath = remotePath)
+                            )
+                        }
+                    }
+            }
+        } else {
+            imagesState.imagesToDelete.map { it.remoteImgPath }.forEach { remotePath ->
+                storage.child(remotePath).delete()
+                    .addOnFailureListener {
+                        viewModelScope.launch(Dispatchers.IO) {
+                            imageToDeleteDao.addImageToDelete(
+                                ImageToDelete(remoteImagePath = remotePath)
+                            )
+                        }
+                    }
+            }
+        }
+    }
+
+    private fun extractImagePath(fullImageUrl: String): String {
+        val chunks = fullImageUrl.split("%2F")
+        val imageName = chunks[2].split("?").first()
+        return "images/${Firebase.auth.currentUser?.uid}/$imageName"
+    }
 }
 
 data class UiState(
@@ -212,5 +314,6 @@ data class UiState(
     val content: String = "",
     val dateCreated: RealmInstant? = null,
     val categoryId: String? = null,
-    val fontSize: Double = 16.0
+    val fontSize: Double = 16.0,
+
 )

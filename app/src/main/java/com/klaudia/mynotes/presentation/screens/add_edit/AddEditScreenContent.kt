@@ -1,5 +1,6 @@
 package com.klaudia.mynotes.presentation.screens.add_edit
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +38,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.klaudia.mynotes.R
+import com.klaudia.mynotes.model.Image
+import com.klaudia.mynotes.model.ImagesState
 import com.klaudia.mynotes.model.Note
 import com.klaudia.mynotes.presentation.components.FontSizeSlider
+import com.klaudia.mynotes.presentation.components.GalleryUploader
+import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.launch
 
 
@@ -53,7 +58,10 @@ fun AddEditScreenContent(
     paddingValues: PaddingValues,
     onSaveClicked: (Note) -> Unit,
     fontSize: Float,
-    onFontSizeChange: (Double) -> Unit
+    onFontSizeChange: (Double) -> Unit,
+    imagesState: ImagesState,
+    onImageSelect: (Uri) -> Unit,
+    onImageClicked: (Image) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
@@ -133,6 +141,17 @@ fun AddEditScreenContent(
         )
 
         Spacer(modifier = Modifier.height(12.dp))
+        GalleryUploader(
+            galleryState = imagesState,
+            onAddClicked = { focusManager.clearFocus()},
+            onImageSelect = onImageSelect,
+            onImageClicked = onImageClicked
+        )
+        Text(
+            text = stringResource(R.string.images_might_take_a_while_to_upload_download),
+            style = MaterialTheme.typography.labelSmall
+        )
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(
             modifier = Modifier
@@ -150,6 +169,7 @@ fun AddEditScreenContent(
                             this.categoryId = org.mongodb.kbson.ObjectId.invoke(hexString)
                             }
                             this.fontSize = fontSize.toDouble()
+                            this.images = imagesState.images.map { it.remoteImgPath}.toRealmList()
                         }
                     )
                 } else {

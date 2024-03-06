@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.klaudia.mynotes.R
 import com.klaudia.mynotes.presentation.components.LoginWithGoogleButton
@@ -66,12 +67,25 @@ fun AuthenticationScreen(
                     Log.d("TOKEN", googleIdToken.toString())
                     val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
                     viewModel.signInWithGoogle(googleCredentials, isSuccessful = {
-                        viewModel.signInWithMongoDB(
-                            tokenId = googleIdToken!!,
-                            onSuccess = { },
-                            onError = {}
-                        )
-                        viewModel.setLoading(false)
+                        FirebaseAuth.getInstance().signInWithCredential(googleCredentials).addOnCompleteListener {
+                            if (it.isSuccessful){
+                                viewModel.signInWithMongoDB(
+                                    tokenId = googleIdToken!!,
+                                    onSuccess = { },
+                                    onError = {}
+                                )
+                                viewModel.setLoading(false)
+                            }
+                            else{
+
+                                it.exception?.message?.let { it1 ->
+                                    Log.d("Firebase error auth screen",
+                                        it1
+                                    )
+                                }
+                            }
+                        }
+
                     })
 
                 } catch (it: ApiException) {

@@ -24,6 +24,8 @@ import com.klaudia.mynotes.data.ManageCategoriesRepository
 import com.klaudia.mynotes.data.ManageCategoriesRepositoryImpl
 import com.klaudia.mynotes.data.MongoDbRepository
 import com.klaudia.mynotes.data.MongoDbRepositoryImpl
+import com.klaudia.mynotes.data.db.entity.ImageToDeleteDao
+import com.klaudia.mynotes.data.db.entity.ImageToUploadDao
 import com.klaudia.mynotes.util.Constants.SIGN_IN_REQUEST
 import com.klaudia.mynotes.util.Constants.SIGN_UP_REQUEST
 import com.klaudia.mynotes.util.Constants.WEB_CLIENT
@@ -45,22 +47,40 @@ object AppModule {
 
     @ViewModelScoped
     @Provides
-    fun provideCategoryService(mongoDbRepository: MongoDbRepository): CategoryService = CategoryService(mongoDbRepository)
-    @ViewModelScoped
-    @Provides
-    fun provideHomeRepository(mongoDbRepository: MongoDbRepository, categoryService: CategoryService): HomeRepository = HomeRepositoryImpl(mongoDbRepository, categoryService)
+    fun provideCategoryService(mongoDbRepository: MongoDbRepository): CategoryService =
+        CategoryService(mongoDbRepository)
 
     @ViewModelScoped
     @Provides
-    fun provideAddEditRepository(mongoDbRepository: MongoDbRepository): AddEditRepository = AddEditRepositoryImpl(mongoDbRepository)
+    fun provideHomeRepository(
+        mongoDbRepository: MongoDbRepository,
+        categoryService: CategoryService
+    ): HomeRepository = HomeRepositoryImpl(mongoDbRepository, categoryService)
 
     @ViewModelScoped
     @Provides
-    fun provideManageCategoriesRepository(mongoDbRepository: MongoDbRepository, categoryService: CategoryService): ManageCategoriesRepository = ManageCategoriesRepositoryImpl(mongoDbRepository, categoryService)
+    fun provideAddEditRepository(
+        mongoDbRepository: MongoDbRepository,
+        imageToDelete: ImageToDeleteDao,
+        imageToUpload: ImageToUploadDao
+    ): AddEditRepository =
+        AddEditRepositoryImpl(mongoDbRepository, imageToDelete, imageToUpload)
 
     @ViewModelScoped
     @Provides
-    fun provideListNotesOfCategoryRepository(mongoDbRepository: MongoDbRepository, categoryService: CategoryService): ListNotesOfCategoryRepository = ListNotesOfCategoryRepositoryImpl(mongoDbRepository, categoryService)
+    fun provideManageCategoriesRepository(
+        mongoDbRepository: MongoDbRepository,
+        categoryService: CategoryService
+    ): ManageCategoriesRepository =
+        ManageCategoriesRepositoryImpl(mongoDbRepository, categoryService)
+
+    @ViewModelScoped
+    @Provides
+    fun provideListNotesOfCategoryRepository(
+        mongoDbRepository: MongoDbRepository,
+        categoryService: CategoryService
+    ): ListNotesOfCategoryRepository =
+        ListNotesOfCategoryRepositoryImpl(mongoDbRepository, categoryService)
 
     @Provides
     fun providesFirebaseAuth() = Firebase.auth
@@ -128,4 +148,7 @@ object AppModule {
         )
         .setAutoSelectEnabled(true)
         .build()
+
+
+
 }

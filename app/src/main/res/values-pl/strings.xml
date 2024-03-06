@@ -42,4 +42,5 @@
     <string name="font_size">"Rozmiar czcionki: "</string>
     <string name="ok">Ok</string>
     <string name="share">Udostępnij</string>
+    <string name="images_might_take_a_while_to_upload_download">Zdjęcia mogą się chwilę ładować/pobierać</string>
 </resources>

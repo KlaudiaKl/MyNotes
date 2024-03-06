@@ -41,4 +41,5 @@
     <string name="font_size">Font size:</string>
     <string name="ok">Ok</string>
     <string name="share">Share</string>
+    <string name="images_might_take_a_while_to_upload_download">Images might take a while to upload/download</string>
 </resources>

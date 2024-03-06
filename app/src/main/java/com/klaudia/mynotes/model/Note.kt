@@ -3,7 +3,9 @@ package com.klaudia.mynotes.model
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.klaudia.mynotes.util.toRealmInstant
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import org.mongodb.kbson.ObjectId
@@ -21,6 +23,7 @@ open class Note : RealmObject {
     var ownerId: String = ""
     var title: String = ""
     var content: String = ""
+    var images: RealmList<String> = realmListOf()
 
     @RequiresApi(Build.VERSION_CODES.O)
     var dateCreated: RealmInstant = Instant.now().toRealmInstant()

@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
@@ -24,6 +25,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.klaudia.mynotes.R
 import com.klaudia.mynotes.model.Category
+import com.klaudia.mynotes.model.Image
+import com.klaudia.mynotes.model.rememberImagesState
 
 import com.klaudia.mynotes.presentation.components.AddNewCategoryDialog
 import com.klaudia.mynotes.presentation.components.AlertDialog
@@ -251,6 +254,9 @@ fun NavGraphBuilder.addEditScreenRoute(
             contract = ActivityResultContracts.StartActivityForResult(),
             onResult = {})
         val shareNoteEvent = viewModel.shareNoteEvent.collectAsState(initial = null).value
+        val imagesState = viewModel.imagesState
+
+
 
         LaunchedEffect(shareNoteEvent) {
             shareNoteEvent?.let {
@@ -286,11 +292,22 @@ fun NavGraphBuilder.addEditScreenRoute(
             },
             onFontSizeChange = { newSize ->
                 viewModel.setFontSize(size = newSize)
+            },
+            imagesState = imagesState,
+            onShareClicked = {
+                viewModel.prepareShareNoteIntent(uiState.title, uiState.content)
+            },
+            onImageSelect = {
+                val type = context.contentResolver.getType(it)?.split("/")?.last() ?: "jpg"
+                viewModel.addImage(
+                    image = it,
+                    imageType = type
+                )
+            },
+            onImageDeleteClicked = {
+                imagesState.deleteImage(it)
             }
-
-        ) {
-            viewModel.prepareShareNoteIntent(uiState.title, uiState.content)
-        }
+        )
 
         CategorySelectionDialog(
             noteCatId = uiState.categoryId,
@@ -542,4 +559,6 @@ fun NavGraphBuilder.listNotesOfCategoryRoute(
             }
         )
     }
+
+
 }
